@@ -171,72 +171,80 @@ web3.eth.defaultAccount = web3.eth.accounts[0]
 # Definisco un oggetto contratto kotet a partire dall'interfaccia e dal bytecode
 kotetContract = web3.eth.contract(abi=kotetInterfaceJS, bytecode=kotetBytecode)
 # Costruisco la transazione per fare il deploy del contratto kotet
-contract_data = kotetContract.constructor().buildTransaction({'value': 1000000000000000000})
+contract_data = kotetContract.constructor().buildTransaction({'from': accounts[0], 'value': 1000000000000000000})
 # Spedisco la transazione 
 deploy_txn = web3.eth.sendTransaction(contract_data)
 #Attendo che la mia transazione venga elaborata e prendo la ricevuta
 txn_receipt = web3.eth.waitForTransactionReceipt(deploy_txn)
 # Salvo in un oggetto il contratto deployato
 contract_kotet = web3.eth.contract(address=txn_receipt.contractAddress, abi=kotetInterfaceJS)
+# Address, balance e functions di KotET
+print("L'account[0] ha pubblicato il contratto KotET: " + str((contract_kotet.address)) 
++ "\nil cui bilancio iniziale è: " + str(web3.eth.getBalance(contract_kotet.address)) + "\ned offre le seguenti funzioni:" + "\n"
++ str(contract_kotet.all_functions()) + "\n")
+
 
 # Definisco un oggetto contratto alice a partire dall'interfaccia e dal bytecode
 aliceContract = web3.eth.contract(abi=aliceInterfaceJS, bytecode=aliceBytecode)
 # Costruisco la transazione per fare il deploy del contratto alice
-contract_data = aliceContract.constructor().buildTransaction()
+contract_data = aliceContract.constructor().buildTransaction({'from': accounts[1]})
 # Spedisco la transazione 
 deploy_txn = web3.eth.sendTransaction(contract_data)
 #Attendo che la mia transazione venga elaborata e prendo la ricevuta
 txn_receipt = web3.eth.waitForTransactionReceipt(deploy_txn)
 # Salvo in un oggetto il contratto deployato
 contract_alice = web3.eth.contract(address=txn_receipt.contractAddress, abi=aliceInterfaceJS)
+# Address, balance e functions di Alice
+print("L'account[1] ha pubblicato il contratto Alice: " + str((contract_alice.address)) 
++ "\nil cui bilancio iniziale è: " + str(web3.eth.getBalance(contract_alice.address)) + "\ned offre le seguenti funzioni:" + "\n"
++ str(contract_alice.all_functions()) + "\n")
 
 # Definisco un oggetto contratto bob a partire dall'interfaccia e dal bytecode
 bobContract = web3.eth.contract(abi=bobInterfaceJS, bytecode=bobBytecode)
 # Costruisco la transazione per fare il deploy del contratto bob
-contract_data = bobContract.constructor().buildTransaction()
+contract_data = bobContract.constructor().buildTransaction({'from': accounts[2]})
 # Spedisco la transazione 
 deploy_txn = web3.eth.sendTransaction(contract_data)
 #Attendo che la mia transazione venga elaborata e prendo la ricevuta
 txn_receipt = web3.eth.waitForTransactionReceipt(deploy_txn)
 # Salvo in un oggetto il contratto deployato
 contract_bob = web3.eth.contract(address=txn_receipt.contractAddress, abi=bobInterfaceJS)
-
-print("======================================================================")
-
-# Funzioni del contratto kotet
-print("Funzioni offerte dal contratto kotet:\n" + str(contract_kotet.all_functions()) + "\n")
-
-# Stampa del re
-print("Re del contratto kotet (perché ne ha fatto il deploy):\n" + str(contract_kotet.functions.king().call()) + "\n")
+# Address, balance e functions di Bob
+print("L'account[2] ha pubblicato il contratto Bob: " + str((contract_bob.address)) 
++ "\nil cui bilancio iniziale è: " + str(web3.eth.getBalance(contract_bob.address)) + "\ned offre le seguenti funzioni:" + "\n"
++ str(contract_bob.all_functions()) + "\n")
 
 # Stampa del re
-print("Re del contratto kotet (perché ne ha fatto il deploy):\n" + str(contract_kotet.functions.king().call()) + "\n")
+print("Re del contratto kotet (è account[0] perché ne ha fatto il deploy):\n" + str(contract_kotet.functions.king().call()) + "\n")
 
 # Stampa del prezzo da pagare per diventare re
 x = contract_kotet.functions.claimPrice().call()
 print("Il prezzo da pagare per diventare re ammonta a:\n" + str(x) + "\n")
 
-print("============================ATTACCO==========================================")
-
-# Bob richiama la funzione unseatKing con 100 wei per far diventare il contratto maligno il nuovo re
-contract_bob.functions.unseatKing(contract_kotet.address, x).transact({'value': x})
+# Bob richiama la funzione unseatKing con 100 wei per far diventare il contratto Bob il nuovo re
+contract_bob.functions.unseatKing(contract_kotet.address, x).transact({'value': x, 'from': accounts[2]})
+print(".........account[2] invoca unseatKing di Bob per far diventare il contratto re.........\n")
 
 # Stampa del nuovo re
-print("Re del contratto kotet (è Bob):\n" + str(contract_kotet.functions.king().call()) + "\n")
+print("Il nuovo re del contratto kotet è il contratto Bob:\n" + str(contract_kotet.functions.king().call()) + "\n")
 
 # Stampa del prezzo da pagare per diventare re aggiornato
 x = contract_kotet.functions.claimPrice().call()
 print("Il nuovo prezzo da pagare per diventare re ammonta a:\n" + str(x) + "\n")
+# Stampa del bilancio del contratto KotET
+print("Bilancio del contratto KotET: " + str(web3.eth.getBalance(contract_kotet.address)) + "\n")
 
 # Adesso Alice riesce a diventare re ma Bob non prende la ricompensa, che viene trattenuta da Kotet 
 # Ho dovuto alzare il gas limit !!
-contract_alice.functions.unseatKing(contract_kotet.address, x).transact({'value': x, 'gasLimit': 3000000})
+print(".........a questo punto account[3] invoca la funzione unseatKing del contratto Alice per farlo diventare re........." + "\n")
+contract_alice.functions.unseatKing(contract_kotet.address, x).transact({'value': x, 'gasLimit': 3000000, 'from': accounts[3]})
 
 # Stampa del nuovo re
-print("Re del contratto kotet (è Alice):\n" + str(contract_kotet.functions.king().call()) + "\n")
+print("Il nuovo re del contratto kotet è il contratto Alice:\n" + str(contract_kotet.functions.king().call()) + "\n")
 
 # Bilancio del contratto kotet
 print("Bilancio del contratto kotet:\n" + str(web3.eth.getBalance(contract_kotet.address)) + "\n")
 
 # Bilancio del contratto bob
-print("Bilancio del contratto Bob:\n" + str(web3.eth.getBalance(contract_bob.address)) + "\n")
+print("Bilancio del contratto Bob:\n" + str(web3.eth.getBalance(contract_bob.address)) + "\n"+
+"Questo significa che il contratto Bob non è più re ma non ha preso la ricompensa che gli spettava\n")
