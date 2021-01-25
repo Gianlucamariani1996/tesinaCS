@@ -1,8 +1,8 @@
-# Attacchi ad Ethereum 
+# Attacchi agli smart contracts di Ethereum 
 
-Questo repository contiene la replica, svolta da Gianluca Mariani, di alcuni attacchi fatti ad Etherum per la tesina relativa al corso di [Cybersecurity](http://www.dia.uniroma3.it/~pizzonia/ssir/), tenuto dal prof. [Maurizio Pizzonia](https://compunet.ing.uniroma3.it/#!/people/pizzo), nell'anno accademico 2020-2021.
+Questo repository contiene la replica, svolta da Gianluca Mariani, di alcuni attacchi agli smart contracts di Ethereum per la tesina relativa al corso di [Cybersecurity](http://www.dia.uniroma3.it/~pizzonia/ssir/), tenuto dal prof. [Maurizio Pizzonia](https://compunet.ing.uniroma3.it/#!/people/pizzo), nell'anno accademico 2020-2021.
 
-## Software da installare su proprio PC
+## Software da installare sul proprio PC
 
 Per poter eseguire il codice che replica gli attacchi è necessario installare: 
 
@@ -11,11 +11,9 @@ Per poter eseguire il codice che replica gli attacchi è necessario installare:
 ## Organizzazione del repository 
 
 Questo repository è organizzato in diverse sezioni (cartelle):
-
-* Attacco1
-
-* Attacco2
-
+* [Attacco-KotET(v1)](Attacco-KotET(v1)/)
+* [Attacco-KotET(v2)](Attacco-KotET(v2)/)
+* [Attacco-OddsAndEvens](Attacco-OddsAndEvens/)
 
 ## Accesso al repository 
 
