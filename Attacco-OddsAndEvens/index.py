@@ -59,56 +59,54 @@ oddsAndEvensBytecode = "6060604052341561000f57600080fd5b33600460016101000a815481
 accounts = web3.eth.accounts
 # Set dell'account con il quale farò i deploy
 web3.eth.defaultAccount = web3.eth.accounts[0]
-print("Account di default:\n" + accounts[0] + "\n")
 
 # Definisco un oggetto contratto oddsAndEvens a partire dall'interfaccia e dal bytecode
 oddsAndEvensContract = web3.eth.contract(abi=oddsAndEvensInterfaceJS, bytecode=oddsAndEvensBytecode)
-
 # Costruisco la transazione per fare il deploy del contratto oddsAndEvens
-contract_data = oddsAndEvensContract.constructor().buildTransaction()
+contract_data = oddsAndEvensContract.constructor().buildTransaction({'from': accounts[0]})
 # Spedisco la transazione 
 deploy_txn = web3.eth.sendTransaction(contract_data)
 #Attendo che la mia transazione venga elaborata e prendo la ricevuta
 txn_receipt = web3.eth.waitForTransactionReceipt(deploy_txn)
 # Salvo in un oggetto il contratto deployato
 contract_oddsAndEvens = web3.eth.contract(address=txn_receipt.contractAddress, abi=oddsAndEvensInterfaceJS)
-
-# Bilancio del contratto oddsAndEvens
-print("Bilancio del contratto oddsAndEvens:\n" + str(web3.eth.getBalance(contract_oddsAndEvens.address)) + "\n")
-
-# Funzioni del contratto oddsAndEvens
-print("Funzioni offerte dal contratto oddsAndEvens:\n" + str(contract_oddsAndEvens.all_functions()) + "\n")
+# Address, balance e functions di oddsAndEvens
+print("L'account[0] ha pubblicato il contratto oddsAndEvens: " + str((contract_oddsAndEvens.address)) 
++ "\nil cui bilancio iniziale è: " + str(web3.eth.getBalance(contract_oddsAndEvens.address)) + "\ned offre le seguenti funzioni:" + "\n"
++ str(contract_oddsAndEvens.all_functions()) + "\n")
 
 # Bilancio di Alice prima di giocare
-print("Bilancio Alice:\n" + str(web3.eth.getBalance(accounts[1])) + "\n")
+print("Bilancio Alice (account[1])):\n" + str(web3.eth.getBalance(accounts[1])) + "\n")
 # Alice gioca mettendo il numero 10
-print("Alice gioca un numero: \n")
+print("Alice (account[1]) gioca un numero: \n")
 contract_oddsAndEvens.functions.play(10).transact({'from': accounts[1], 'value': 1000000000000000000})
 # Stampa per dire che Alice ha giocato
-print("Alice ha giocato:\n" + str(10) + "\n")
+print("Alice (account[1]) ha giocato:\n" + str(10) + "\n")
 # Bilancio di Alice prima di giocare
-print("Bilancio Alice(dopo aver giocato):\n" + str(web3.eth.getBalance(accounts[1])) + "\n")
+print("Bilancio di Alice (account[1]) (dopo aver giocato):\n" + str(web3.eth.getBalance(accounts[1])) + "\n")
 
 # Bilancio del contratto oddsAndEvens
-print("Bilancio del contratto oddsAndEvens(dopo che Alice ha giocato):\n" + str(web3.eth.getBalance(contract_oddsAndEvens.address)) + "\n")
+print("Bilancio del contratto oddsAndEvens(dopo che Alice (account[1]) ha giocato):\n" + str(web3.eth.getBalance(contract_oddsAndEvens.address)) + "\n")
+
+# Bilancio di Bob prima di giocare
+print("Bilancio Bob prima di giocare:\n" + str(web3.eth.getBalance(accounts[2])) + "\n")
 
 # Adesso Bob può vedere il numero giocato da Alice visto che la blockchain è pubblica
 y = web3.eth.getStorageAt(contract_oddsAndEvens.address, 1)
 # Converto da HexBytes (visto con print(type(y))) a int
 y = web3.toInt(y)
-print("Il numero  letto da Bob dalla blockchain è:\n" + str(y) + "\n")
+print("A questo punto Bob (account[2]) legge che il numero giocato da Alice e salvato nella blockchain è:\n" + str(y) + "\n")
 
 # Dato che Bob è il secondo a giocare e sa che il contratto paga il secondo giocatore se la somma è dispari
 if(y%2==0):
 	z = 1
 else: 
 	z = 0
-# Bilancio di Bob prima di giocare
-print("Bilancio Bob:\n" + str(web3.eth.getBalance(accounts[2])) + "\n")
-# Bob gioca mettendo il numero 10
+print("A questo punto visto che Bob ha letto il numero " + str(y) + " gioca il numero " + str(z) + "\n")
+# Bob gioca mettendo il numero z
 contract_oddsAndEvens.functions.play(z).transact({'from': accounts[2], 'value': 1000000000000000000})
 # Bilancio di Bob prima di giocare
-print("Bilancio Bob(dopo aver giocato):\n" + str(web3.eth.getBalance(accounts[2])) + "\n")
+print("Bob ha vinto !!! Bilancio Bob(dopo aver giocato):\n" + str(web3.eth.getBalance(accounts[2])) + "\n")
 # Bilancio del contratto oddsAndEvens
 # Si aggiorna, sono wei ricorda
 print("Bilancio del contratto (finale):\n" + str(web3.eth.getBalance(contract_oddsAndEvens.address)) + "guei\n")
