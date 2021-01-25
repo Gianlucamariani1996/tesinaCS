@@ -1,6 +1,6 @@
 # Attacchi ad Ethereum 
 
-Questo repository contiene la replica, svolta da Andrea Mariani, di alcuni attacchi fatti ad Etherum per la tesina relativa al corso di [Cybersecurity](http://www.dia.uniroma3.it/~pizzonia/ssir/), tenuto dal prof. [Maurizio Pizzonia](https://compunet.ing.uniroma3.it/#!/people/pizzo), nell'anno accademico 2020-2021.
+Questo repository contiene la replica, svolta da Gianluca Mariani, di alcuni attacchi fatti ad Etherum per la tesina relativa al corso di [Cybersecurity](http://www.dia.uniroma3.it/~pizzonia/ssir/), tenuto dal prof. [Maurizio Pizzonia](https://compunet.ing.uniroma3.it/#!/people/pizzo), nell'anno accademico 2020-2021.
 
 ## Software da installare su proprio PC
 
@@ -21,11 +21,11 @@ Questo repository è organizzato in diverse sezioni (cartelle):
 
 Per effettuare il download del repository:
 
-    git clone https://github.com/andreamariani1996/progettoASW2020.git
+    git clone https://github.com/Gianlucamariani1996/tesinaCS.git
 
 Oppure se il sistema host è Windows:
 
-    git clone --config core.autocrlf=input https://github.com/andreamariani1996/progettoASW2020.git 
+    git clone --config core.autocrlf=input https://github.com/Gianlucamariani1996/tesinaCS.git 
 
 Per aggiornare il contenuto della propria copia locale del repository: 
 
