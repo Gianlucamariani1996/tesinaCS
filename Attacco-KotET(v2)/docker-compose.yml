@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web3:
+    build: ./
+    depends_on:
+      - "node"
+    command: ["./wait-for-it.sh", "node:8545", "--", "python", "index.py"]
+
+  node:
+    image: trufflesuite/ganache-cli:v6.12.2
+    command: ["ganache-cli", "-d", "-m", "brass bus same payment express already energy direct type have venture afraid"]
