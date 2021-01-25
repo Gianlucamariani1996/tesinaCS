@@ -1,4 +1,4 @@
-# Attacco al contratto SimpleDAO(v2)
+# Attacco al contratto KotET(v1)
 
 ## Esecuzione
 
